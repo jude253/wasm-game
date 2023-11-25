@@ -40,6 +40,25 @@ static inline const char *emscripten_event_type_to_string(int eventType) {
   return events[eventType];
 }
 
+
+EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
+  printf("%s, screen: (%d,%d), client: (%d,%d),%s%s%s%s button: %hu, buttons: %hu, movement: (%d,%d), target: (%d, %d)\n",
+    emscripten_event_type_to_string(eventType), e->screenX, e->screenY, e->clientX, e->clientY,
+    e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
+    e->button, e->buttons, e->movementX, e->movementY, e->targetX, e->targetY);
+
+  if (e->screenX != 0 && e->screenY != 0 && e->clientX != 0 && e->clientY != 0 && e->targetX != 0 && e->targetY != 0) {
+    if (eventType == EMSCRIPTEN_EVENT_CLICK) printf("gotClick = 1\n");
+    if (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN && e->buttons != 0) printf("gotClick = 1\n");
+    if (eventType == EMSCRIPTEN_EVENT_DBLCLICK) printf("gotClick = 1\n");
+    if (eventType == EMSCRIPTEN_EVENT_MOUSEUP) printf("gotClick = 1\n");
+    if (eventType == EMSCRIPTEN_EVENT_MOUSEMOVE && (e->movementX != 0 || e->movementY != 0)) printf("gotMouseMove = 1\n");
+  }
+  draw();
+
+  return 0;
+}
+
 EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData)
 {
   int dom_pk_code = emscripten_compute_dom_pk_code(e->code);
@@ -62,11 +81,10 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
 }
 
 
-
-
 int main(int argc, char** argv) {
   printf("hello, world!\n");
   emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
+  emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
   srand (time(NULL));
   
   SDL_Init(SDL_INIT_VIDEO);
