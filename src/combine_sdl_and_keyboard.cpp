@@ -10,10 +10,10 @@
 #include <emscripten/key_codes.h>
 #include <emscripten/html5.h>
 
+SDL_Surface *screen = NULL;
+
 
 void draw() {
-  SDL_Init(SDL_INIT_VIDEO);
-  SDL_Surface *screen = SDL_SetVideoMode(256, 256, 32, SDL_SWSURFACE);
 
   if (SDL_MUSTLOCK(screen)) SDL_LockSurface(screen);
   int r = rand() % 256;
@@ -27,8 +27,6 @@ void draw() {
   }
   if (SDL_MUSTLOCK(screen)) SDL_UnlockSurface(screen);
   SDL_Flip(screen); 
-
-  SDL_Quit();
 }
 
 static inline const char *emscripten_event_type_to_string(int eventType) {
@@ -71,8 +69,14 @@ int main(int argc, char** argv) {
   emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
   srand (time(NULL));
   
+  SDL_Init(SDL_INIT_VIDEO);
+  screen = SDL_SetVideoMode(256, 256, 32, SDL_SWSURFACE);
+
+  
   draw();
   
+
+  SDL_Quit();
 
   return 0;
 }
