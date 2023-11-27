@@ -20,3 +20,5 @@ Emscripten: https://emscripten.org/index.html
 
 
 Initial compilation command: `emcc src/test_keyboard_codes.c -o public/index.html`
+
+Compile command with SDL2: `emcc src/combine_sdl_and_keyboard.cpp -o public/index.html -sUSE_SDL=2`
